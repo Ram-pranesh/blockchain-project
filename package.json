@@ -1,17 +1,19 @@
 {
   "name": "blockchain-project",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "description": "this is my first project",
+  "main": "server.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start" : "node server.js",
+    "dev": "nodemon server.js"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/Ram-pranesh/blockchain-project.git"
   },
   "keywords": [],
-  "author": "",
+  "author": "rampranesh",
   "license": "ISC",
   "type": "commonjs",
   "bugs": {
@@ -23,5 +25,8 @@
     "dotenv": "^17.2.1",
     "express": "^5.1.0",
     "mongoose": "^8.16.5"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.10"
   }
 }
