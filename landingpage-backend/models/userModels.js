@@ -2,13 +2,17 @@ const mongoose = require("mongoose")
 
 const userModel = new mongoose.Schema(
     {
-        name:{
-            type : String,
-            required:[true,"please enter your name"],
-        },
         email:{
             type:String,
             required:[true,"enter your email"],
+            unique:true,
+            lowercase:true,
+            validate:{
+                validator: function(value){
+                    return value.endsWith('@gmail.com');
+                },
+                message: "Invalid mail Id"
+            }
         },
         password:{
             type:String,
@@ -24,5 +28,4 @@ const userModel = new mongoose.Schema(
     }
 )
 
-const User = mongoose.model("User" , userModel)
-model.exports = User
+model.exports = mongoose.model("User" , userModel)
