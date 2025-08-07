@@ -1,12 +1,26 @@
-const models = reqiure('../models/userModels')
+require('dotenv').config()
 
-const create = async(req,res) =>{
+const User = require('../models/userModels')
+const bcrypt = require('bcrypt')
+const jwt = require('jsonwebtoken')
+
+// to create user
+const SignUp = async(req,res) =>{
     try{
-        const user = await UserActivation.create(req.body)
+        const {name , email ,password} = req.body
+        const existingUser = await User.findOne({email})
+
+        if(existingUser) return res.status(400).json({success:false,message:true})
+
+        const hashedPassword = await bcrypt.hash(password,4) // hashing password 
+        const user = await User.create({name, email, password:hashedPassword})
+
+        const token = jwt.sign({id:user._id , mail:user.email},process.env.SECRET_TOKEN,{expiresIn:'3h'})
+
         console.log(user)
         return res.status(200).json({
             success:true,
-            USER:user
+            token,user
         })
     } catch(err){
         console.log(err)
@@ -16,10 +30,10 @@ const create = async(req,res) =>{
         })
     }
 }
-
+// to fetch all users in database
 const fetchAll = async(req,res)=>{
     try{
-        const allUsers = await User.fetch({})
+        const allUsers = await User.find({})
         if(allUsers.length === 0) {
             return res.status(200).json({
                 success:true,
@@ -37,5 +51,79 @@ const fetchAll = async(req,res)=>{
             success:false,
             error:err.message
         })
+    }
+}
+//login user
+const login = async(req,res)=>{
+    try{
+        const {email,password} = req.body
+        const user = await User.findOne({email})
+        
+        if(!user) return res.status(400).json({
+            success:false,
+            message:'User mail does not exists'
+        })
+
+        const verify = await bcrypt.compare(password,user.password)
+        const token = jwt.sign({id:user._id,mail:user.email},process.env.SECRET_TOKEN,{expiresIn:'3h'})
+        if(verify){
+            return res.status(200).json({
+                success:true,
+                message : 'Login Succesful',
+                token,user
+            })
+        }
+        else return res.status(401).json({
+            success:false,
+            message:'Invalid Password'
+        })
+
+    } catch(err){
+        return res.status(500).json({
+            success:false,
+            error:err.message
+        })
+    }
+}
+// to fetch by email
+const fetchByEmail = async(req,res)=>{
+    const mail = req.body.email
+    const user = await User.findOne({email})
+    
+    if(!user) return res.status(400).json({success:false,message:"user does not exists"})
+    
+    try{
+        console.log(mail)
+        return res.status(200)
+    } catch(err){
+        return res.status(500).json({success:false,error:err.message})
+    }
+}
+//to logout user
+const logout = async(req,res)=>{
+    try{
+        res.clearCookie('token', {httpOnly:true,secure:true})
+        return res.status(200).json({success:true,message:'user logged out successfully'})
+    } catch(err){
+        return res.status(500).json({success:false,error:err.message})
+    }
+}
+//change password
+const changePassword = async(req,res)=>{
+    const {oldPassword,newPassword} = req.body
+    const user = await User.findById(req.user.id)
+    if(!user) return res.status(400).json({success:false,message:'User Not Found'})
+    try{
+        const match = bcrypt.compare(oldPassword,user.password)
+        if(!match) return res.status(400).json({success:false,message:'Password is Incorrect'})
+
+        const hashedNewPassword = await bcrypt.hash(newPassword,4)
+        user.password = hashedNewPassword
+        await user.save()
+
+        return res.status(200).json({success:true,message:'Password Changed Succesfully'})
+
+    } catch(err){
+        return res.status(500).json({success:false,error:err.message})
     }
 }
