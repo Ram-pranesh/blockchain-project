@@ -6,13 +6,15 @@ const jwt = require('jsonwebtoken')
 // to create user
 const SignUp = async(req,res) =>{
     try{
-        const {name , email ,password} = req.body
+        const {name , email ,password, confirmPassword} = req.body
         const existingUser = await User.findOne({email})
 
-        if(existingUser) return res.status(400).json({success:false,message:true})
-            
+        if(existingUser) return res.status(400).json({success:false,message:'User already exists'})
+        
+            if(!(password === confirmPassword)) return res.status(400).json({success:true,message:"passwords does not match"})
+        
         const hashedPassword = await bcrypt.hash(password,4) // hashing password 
-        const user = await User.create({name, email, password:hashedPassword})
+        const user = await User.create({name, email, password:hashedPassword, confirmPassword:hashedPassword})
 
         const token = jwt.sign({id:user._id , mail:user.email},process.env.SECRET_TOKEN,{expiresIn:'3h'})
 
