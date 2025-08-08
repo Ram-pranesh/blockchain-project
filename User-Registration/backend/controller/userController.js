@@ -1,5 +1,4 @@
 require('dotenv').config()
-
 const User = require('../models/userModels')
 const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
@@ -11,7 +10,7 @@ const SignUp = async(req,res) =>{
         const existingUser = await User.findOne({email})
 
         if(existingUser) return res.status(400).json({success:false,message:true})
-
+            
         const hashedPassword = await bcrypt.hash(password,4) // hashing password 
         const user = await User.create({name, email, password:hashedPassword})
 
@@ -30,7 +29,16 @@ const SignUp = async(req,res) =>{
         })
     }
 }
-// to fetch all users in database
+//confirm password
+const confirmPassword = async(req,res)=>{
+    const {password, confirmPassword} = await req.body
+    if(password !== confirmPassword) return res.staus(400).json({
+        success:false , message:'Passwords does not match'
+    })
+    else res.status(200).json({success:true})
+}
+
+// to fetch all users in database #admin
 const fetchAll = async(req,res)=>{
     try{
         const allUsers = await User.find({})
@@ -85,7 +93,7 @@ const login = async(req,res)=>{
         })
     }
 }
-// to fetch by email
+// to fetch by email #admin
 const fetchByEmail = async(req,res)=>{
     const mail = req.body.email
     const user = await User.findOne({email})
@@ -100,14 +108,15 @@ const fetchByEmail = async(req,res)=>{
     }
 }
 //to logout user
-const logout = async(req,res)=>{
-    try{
-        res.clearCookie('token', {httpOnly:true,secure:true})
-        return res.status(200).json({success:true,message:'user logged out successfully'})
-    } catch(err){
-        return res.status(500).json({success:false,error:err.message})
-    }
-}
+// const logout = async(req,res)=>{
+//     try{
+        
+
+//         return res.status(200).json({success:true,message:'user logged out successfully'})
+//     } catch(err){
+//         return res.status(500).json({success:false,error:err.message})
+//     }
+// }
 //change password
 const changePassword = async(req,res)=>{
     const {oldPassword,newPassword} = req.body
@@ -127,3 +136,6 @@ const changePassword = async(req,res)=>{
         return res.status(500).json({success:false,error:err.message})
     }
 }
+
+
+modules.exports = {SignUp, fetchAll, login, fetchByEmail, changePassword}
