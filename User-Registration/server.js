@@ -1,4 +1,4 @@
-require('dotenv').config
+require('dotenv').config()
 
 const express = require("express");
 const mongoose = require("mongoose");
@@ -14,7 +14,7 @@ const MONGO_URI = process.env.MONGO_URI_ConnectionString
 mongoose.connect(MONGO_URI)
 .then(()=> {
     console.log("DB is connected");
-    app.listen(PORT,() => {console.log(`app is listening to the port : ${port}`);})
+    app.listen(PORT,() => {console.log(`app is listening to the port : ${PORT}`);})
 })
 .catch((error) => {
     console.log(error);

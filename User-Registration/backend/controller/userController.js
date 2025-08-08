@@ -32,7 +32,7 @@ const SignUp = async(req,res) =>{
 //confirm password
 const confirmPassword = async(req,res)=>{
     const {password, confirmPassword} = await req.body
-    if(password !== confirmPassword) return res.staus(400).json({
+    if(password !== confirmPassword) return res.status(400).json({
         success:false , message:'Passwords does not match'
     })
     else res.status(200).json({success:true})
@@ -96,7 +96,7 @@ const login = async(req,res)=>{
 // to fetch by email #admin
 const fetchByEmail = async(req,res)=>{
     const mail = req.body.email
-    const user = await User.findOne({email})
+    const user = await User.findOne({mail})
     
     if(!user) return res.status(400).json({success:false,message:"user does not exists"})
     
@@ -123,7 +123,7 @@ const changePassword = async(req,res)=>{
     const user = await User.findById(req.user.id)
     if(!user) return res.status(400).json({success:false,message:'User Not Found'})
     try{
-        const match = bcrypt.compare(oldPassword,user.password)
+        const match = await bcrypt.compare(oldPassword,user.password)
         if(!match) return res.status(400).json({success:false,message:'Password is Incorrect'})
 
         const hashedNewPassword = await bcrypt.hash(newPassword,4)
@@ -138,4 +138,4 @@ const changePassword = async(req,res)=>{
 }
 
 
-modules.exports = {SignUp, fetchAll, login, fetchByEmail, changePassword}
+module.exports = {SignUp, fetchAll, login, fetchByEmail, changePassword}
