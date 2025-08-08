@@ -112,7 +112,7 @@ const fetchByEmail = async(req,res)=>{
 //to logout user
 // const logout = async(req,res)=>{
 //     try{
-        
+//         const mail = User.findOne({email})
 
 //         return res.status(200).json({success:true,message:'user logged out successfully'})
 //     } catch(err){
