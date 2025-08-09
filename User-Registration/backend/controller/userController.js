@@ -95,6 +95,7 @@ const login = async(req,res)=>{
         })
     }
 }
+
 // to fetch by email #admin
 const fetchByEmail = async(req,res)=>{
     const mail = req.body.email
