@@ -77,6 +77,9 @@ const login = async(req,res)=>{
         const verify = await bcrypt.compare(password,user.password)
         const token = jwt.sign({id:user._id,mail:user.email},process.env.SECRET_TOKEN,{expiresIn:'3h'})
         if(verify){
+
+            res.redirect('/landing.html')
+
             return res.status(200).json({
                 success:true,
                 message : 'Login Succesful',
