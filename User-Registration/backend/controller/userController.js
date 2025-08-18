@@ -2,6 +2,13 @@ require('dotenv').config()
 const User = require('../models/userModels')
 const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
+const express = require('express')
+const path = require('path')
+const app = express()
+
+app.use(express.urlencoded({ extended: true }));
+app.use(express.json());
+app.use(express.static(path.join(__dirname, 'User-Registration/frontend')));
 
 // to create user
 const SignUp = async(req,res) =>{
@@ -16,13 +23,10 @@ const SignUp = async(req,res) =>{
         const hashedPassword = await bcrypt.hash(password,4) // hashing password 
         const user = await User.create({name, email, password:hashedPassword, confirmPassword:hashedPassword})
 
-        const token = jwt.sign({id:user._id , mail:user.email},process.env.SECRET_TOKEN,{expiresIn:'3h'})
+        const token = await jwt.sign({id:user._id , mail:user.email},process.env.SECRET_TOKEN,{expiresIn:'3h'})
 
         console.log(user)
-        return res.status(200).json({
-            success:true,
-            token,user
-        })
+        return res.redirect(303, '/landing.html'); // redirect to landing page after signup
     } catch(err){
         console.log(err)
         return res.status(500).json({
@@ -78,7 +82,7 @@ const login = async(req,res)=>{
         const token = jwt.sign({id:user._id,mail:user.email},process.env.SECRET_TOKEN,{expiresIn:'3h'})
         if(verify){
 
-            res.redirect('/landing.html')
+            res.redirect(303,'/landing.html')
 
             return res.status(200).json({
                 success:true,

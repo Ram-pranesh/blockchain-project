@@ -13,14 +13,14 @@ app.use(express.json())
 
 app.use(express.urlencoded({ extended: true }));
 // Serve static files from the frontend directory
-app.use(express.static(path.join(__dirname, "User-Registration/frontend")))
+app.use(express.static(path.join(__dirname, "User-Registration/frontend"))) // can access frontend files directly without specifying the routes
 
 // API routes
-app.use("/api/v1/users", router)
+app.use("/api/v1/users", router) // API route for user operations
 
 // Default route to serve the login page
 app.get("/", (req, res) => {
-    res.sendFile(path.join(__dirname, "User-Registration/frontend/login.html"))
+    res.sendFile(path.join(__dirname, "User-Registration/frontend/login.html")) // Serve the login page as the default route
 });
 
 const PORT = process.env.PORT || 3001
